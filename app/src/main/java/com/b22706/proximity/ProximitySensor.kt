@@ -7,6 +7,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import java.io.FileWriter
@@ -20,6 +22,8 @@ class ProximitySensor(context:Context, private val listener: SensorEventListener
     private val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
     val proximity: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
 
+    private var _proximityData = MutableLiveData(0F)
+    val proximityData: LiveData<Float> = _proximityData
     var queue: LinkedList<ProximitySensorData> = LinkedList()
     private set
     data class ProximitySensorData(
@@ -78,6 +82,7 @@ class ProximitySensor(context:Context, private val listener: SensorEventListener
     override fun onSensorChanged(event: SensorEvent) {
         if(event.sensor.type == Sensor.TYPE_PROXIMITY){
             val data = event.values.clone()[0]
+            _proximityData.postValue(data)
             if(queueBoolean) queue.add(ProximitySensorData(System.currentTimeMillis(), data))
             Log.d(LOG_NAME, "${event.sensor.type}:${data}")
         }

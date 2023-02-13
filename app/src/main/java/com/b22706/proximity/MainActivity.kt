@@ -5,17 +5,17 @@ import android.os.Environment
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.b22706.proximity.ui.theme.ProximityTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +35,8 @@ class MainActivity : ComponentActivity() {
 
     private fun createSetContent(){
         setContent {
-            var csvButtonText by remember { mutableStateOf("csv start") }
+            var csvButtonText by remember { mutableStateOf("csv start")}
+            val proximityText by proximity.proximityData.observeAsState()
 
             ProximityTheme {
                 // A surface container using the 'background' color from the theme
@@ -43,11 +44,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
+                        Greeting(name = proximityText.toString())
+                        Spacer(modifier = Modifier.size(Dp(20F)))
                         OnClickButton(text = csvButtonText) {
                             csvButtonText = when(csvBoolean){
                                 true -> {
@@ -71,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+    Text(text = name)
 }
 
 @Composable
