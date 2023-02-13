@@ -26,6 +26,11 @@ class ProximitySensor(context:Context, private val listener: SensorEventListener
         val time: Long,
         val distance: Float
     )
+    fun queueReset(){
+        queueBoolean = false
+        queue = LinkedList()
+    }
+    var queueBoolean = false
 
     fun start(){
         sensorManager.registerListener(this, proximity, SensorManager.SENSOR_DELAY_NORMAL)
@@ -73,7 +78,7 @@ class ProximitySensor(context:Context, private val listener: SensorEventListener
     override fun onSensorChanged(event: SensorEvent) {
         if(event.sensor.type == Sensor.TYPE_PROXIMITY){
             val data = event.values.clone()[0]
-            queue.add(ProximitySensorData(System.currentTimeMillis(), data))
+            if(queueBoolean) queue.add(ProximitySensorData(System.currentTimeMillis(), data))
             Log.d(LOG_NAME, "${event.sensor.type}:${data}")
         }
     }

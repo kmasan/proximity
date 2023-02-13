@@ -26,6 +26,9 @@ class LightSensor(context:Context, private val listener: SensorEventListener?): 
         val time: Long,
         val lux: Float
     )
+    fun queueReset(){
+        queue = LinkedList()
+    }
 
     fun start(){
         sensorManager.registerListener(this, light, SensorManager.SENSOR_DELAY_NORMAL)
