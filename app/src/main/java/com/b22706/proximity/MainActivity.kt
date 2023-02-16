@@ -20,6 +20,7 @@ import com.b22706.proximity.ui.theme.ProximityTheme
 
 class MainActivity : ComponentActivity() {
     lateinit var proximity: ProximitySensor
+    lateinit var lightSensor: LightSensor
 
     var externalFilePath = ""
     var csvBoolean = false
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         proximity = ProximitySensor(this, null).apply { start() }
+//        lightSensor = LightSensor(this, null).apply { start() }
         externalFilePath = this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
 
         createSetContent()
@@ -36,7 +38,7 @@ class MainActivity : ComponentActivity() {
     private fun createSetContent(){
         setContent {
             var csvButtonText by remember { mutableStateOf("csv start")}
-            val proximityText by proximity.proximityData.observeAsState()
+            val proximityText = ""//by proximity.proximityData.observeAsState()
 
             ProximityTheme {
                 // A surface container using the 'background' color from the theme
@@ -53,12 +55,14 @@ class MainActivity : ComponentActivity() {
                         OnClickButton(text = csvButtonText) {
                             csvButtonText = when(csvBoolean){
                                 true -> {
+                                    csvBoolean = false
                                     proximity.queueBoolean = false
                                     proximity.csvWriter(externalFilePath, System.currentTimeMillis().toString())
                                     "csv start"
                                 }
                                 false ->{
                                     proximity.queueReset()
+                                    csvBoolean = true
                                     proximity.queueBoolean = true
                                     "csv write"
                                 }

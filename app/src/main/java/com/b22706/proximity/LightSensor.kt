@@ -7,6 +7,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import java.io.FileWriter
@@ -20,6 +22,8 @@ class LightSensor(context:Context, private val listener: SensorEventListener?): 
     private val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
     val light: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
 
+    private var _lightData = MutableLiveData(0F)
+    val lightData: LiveData<Float> = _lightData
     var queue: LinkedList<LightSensorData> = LinkedList()
     private set
     data class LightSensorData(
@@ -31,6 +35,7 @@ class LightSensor(context:Context, private val listener: SensorEventListener?): 
     }
 
     fun start(){
+        Log.d(LOG_NAME, light.toString())
         sensorManager.registerListener(this, light, SensorManager.SENSOR_DELAY_NORMAL)
         if(listener != null) sensorManager.registerListener(listener, light, SensorManager.SENSOR_DELAY_NORMAL)
     }
@@ -77,7 +82,7 @@ class LightSensor(context:Context, private val listener: SensorEventListener?): 
         if(event.sensor.type == Sensor.TYPE_LIGHT){
             val data = event.values.clone()[0]
             queue.add(LightSensorData(System.currentTimeMillis(), data))
-            Log.d(ProximitySensor.LOG_NAME, "${event.sensor.type}:${data}")
+            Log.d(LOG_NAME, "${event.sensor.type}:${data}")
         }
     }
 
